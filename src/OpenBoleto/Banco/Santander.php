@@ -119,16 +119,28 @@ class Santander extends BoletoAbstract
 
     /**
      * Método para gerar o código da posição de 20 a 44
-     *
+     * Conforme manual Código de Barras Versão 2.9 – Janeiro/2015
      * @return string
      * @throws \OpenBoleto\Exception
      */
     public function getCampoLivre()
     {
-        return '9' . self::zeroFill($this->getConta(), 7) .
-            $this->getNossoNumero() .
-            self::zeroFill($this->getIos(), 1) .
-            self::zeroFill($this->getCarteira(), 3);
+	    $nosso_num = str_replace(" ", "", $this->gerarNossoNumero());
+
+	    return
+		    //primeiro grupo (20-24)
+		    '9'                                 //(1) Fixo "9"
+	        . substr($this->getConta(), 0, 4)   //(4) Código do Beneficiário padrão Santander
+
+	        //segundo grupo (25-34)
+	        . substr($this->getConta(), 4, 3)   //(3) Restante do codigo do beneficiário padrão Santander
+	        . substr($nosso_num, 0, 7)          //(7) 7 primeiros campos do N/N
+
+		    //terceiro grupo (35-44)
+		    . substr($nosso_num, 7, 6)                  //(6) Restando do Nosso NUmero com DV
+		    . self::zeroFill($this->getIos(), 1)        //(1) IOF – somente para Seguradoras (Se 7% informar 7, limitado a 9%) Demais clientes usar 0 (zero)
+		    . self::zeroFill($this->getCarteira(), 3)   //(3) Tipo de Modalidade Carteira
+		    ;
     }
 
     /**
