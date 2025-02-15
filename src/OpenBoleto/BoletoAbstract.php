@@ -1431,11 +1431,8 @@ abstract class BoletoAbstract
 
         $dataVencimento = $this->getDataVencimento();
 
-        $date = new DateTime('2025-02-22'); //2025 reset
-        if ($dataVencimento == $date) {
-            return (string) 1000;
-        }
-        else if ($dataVencimento > $date) {
+        $date = new DateTime('2025-02-22');
+        if ($dataVencimento > $date) {
             return (string) $date->diff($dataVencimento)->days + 1000;
         }
 
